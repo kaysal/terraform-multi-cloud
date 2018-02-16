@@ -362,7 +362,6 @@ resource "google_compute_forwarding_rule" "fr_udp4500" {
 resource "google_compute_vpn_tunnel" "tunnel1" {
   name               = "aws-tunnel1"
   region             = "${var.region}"
-  //peer_ip            = "${var.peer_ip1}"
   peer_ip            = "${data.terraform_remote_state.aws_data.vpn_connection_tunnel1_address}"
   ike_version = "1"
   shared_secret      = "${var.preshared_key}"
@@ -385,7 +384,6 @@ resource "google_compute_vpn_tunnel" "tunnel1" {
 resource "google_compute_vpn_tunnel" "tunnel2" {
   name               = "aws-tunnel2"
   region             = "${var.region}"
-  //peer_ip            = "${var.peer_ip2}"
   peer_ip            = "${data.terraform_remote_state.aws_data.vpn_connection_tunnel2_address}"
   ike_version = "1"
   shared_secret      = "${var.preshared_key}"

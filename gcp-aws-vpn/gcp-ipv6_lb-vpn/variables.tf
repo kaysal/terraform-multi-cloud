@@ -22,14 +22,6 @@ variable "source_service_accounts" {
   description = "GCE service account"
 }
 
-variable "peer_ip1" {
-  description = "VPN tunnel aws peer ip address #1"
-}
-
-variable "peer_ip2" {
-  description = "VPN tunnel aws peer ip address #2"
-}
-
 variable "preshared_key" {
     description = "preshaed key used for tunnels 1 and 2"
 }
