@@ -5,6 +5,7 @@ provider "aws" {
     secret_key = "${var.secret_key}"
 }
 
+
 # Create a VPC to launch our instances into
 resource "aws_vpc" "vpc" {
     cidr_block = "${var.cidr_block}"
