@@ -197,7 +197,7 @@ resource "google_compute_vpn_tunnel" "tunnel1" {
 
   local_traffic_selector  = [
     "${google_compute_subnetwork.subnet_vm.ip_cidr_range}",
-    "${google_compute_subnetwork.subnet_bastion.ip_cidr_range}"
+    "${google_compute_subnetwork.subnet_vm.ip_cidr_range}"
   ]
   remote_traffic_selector = [
     "${var.remote_cidr}"
@@ -219,7 +219,7 @@ resource "google_compute_vpn_tunnel" "tunnel2" {
 
   local_traffic_selector  = [
     "${google_compute_subnetwork.subnet_vm.ip_cidr_range}",
-    "${google_compute_subnetwork.subnet_bastion.ip_cidr_range}"
+    "${google_compute_subnetwork.subnet_vm.ip_cidr_range}"
   ]
   remote_traffic_selector = [
     "${var.remote_cidr}"

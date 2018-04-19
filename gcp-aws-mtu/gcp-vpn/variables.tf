@@ -7,7 +7,7 @@ variable "region_zone" {
 }
 
 variable "project_name" {
-  description = "lb-ipv6"
+  description = "gcp-mtu-demo"
 }
 
 variable "credentials_file_path" {
