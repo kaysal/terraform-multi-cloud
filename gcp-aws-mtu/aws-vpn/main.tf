@@ -117,15 +117,15 @@ resource "aws_security_group" "internal_sg" {
 
   # internal tcp and icmp access within aws subnet
   ingress {
-    from_port   = 8
+    from_port   = 0
     to_port     = 0
-    protocol    = "icmp"
+    protocol    = "-1"
     cidr_blocks = ["${var.cidr_block}"]
   }
   ingress {
     from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["${var.cidr_block}"]
   }
 }

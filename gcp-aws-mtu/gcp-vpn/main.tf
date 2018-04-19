@@ -65,13 +65,13 @@ resource "google_compute_instance" "instance_1" {
     ssh-keys = "kayode:${file("${var.public_key_path}")}"
   }
 
+  metadata_startup_script = "${file("scripts/install-instance1.sh")}"
+
   service_account {
     scopes = ["https://www.googleapis.com/auth/compute.readonly"]
   }
 }
 
-# Create the www-video instance
-#------------------------------
 resource "google_compute_instance" "instance_2" {
   name         = "instance-2"
   machine_type = "f1-micro"
@@ -94,6 +94,8 @@ resource "google_compute_instance" "instance_2" {
   metadata {
     ssh-keys = "kayode:${file("${var.public_key_path}")}"
   }
+
+  metadata_startup_script = "${file("scripts/install-instance1.sh")}"
 
   service_account {
     scopes = ["https://www.googleapis.com/auth/compute.readonly"]
