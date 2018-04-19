@@ -16,14 +16,24 @@ resource "aws_vpc" "vpc" {
     }
 }
 
-# Create a private subnet to laucnh our DB into
-resource "aws_subnet" "private" {
+# Create a public subnet to laucnh our instances into
+resource "aws_subnet" "public_subnet" {
     vpc_id = "${aws_vpc.vpc.id}"
-    cidr_block = "${var.private_subnet}"
+    cidr_block = "${var.public_subnet}"
     availability_zone = "${var.zone}"
     tags {
-        Name = "${var.name}-private-subnet"
+        Name = "${var.name}-public-subnet"
     }
+}
+
+resource "aws_eip" "eip_instance_1" {
+  instance = "${aws_instance.instance_1.id}"
+  vpc      = true
+}
+
+resource "aws_eip" "eip_instance_2" {
+  instance = "${aws_instance.instance_2.id}"
+  vpc      = true
 }
 
 # Create an internet gateway to give our subnets access to the outside world
@@ -52,7 +62,7 @@ resource "aws_vpn_gateway" "vpc-vgw" {
 # Grant the VPC access to the VPN gateway on its main route table
 resource "aws_route" "vgw-route" {
     route_table_id = "${aws_vpc.vpc.main_route_table_id}"
-    destination_cidr_block = "${var.vpn_dst_cidr_block}"
+    destination_cidr_block = "${var.gcp_cidr}"
     gateway_id = "${aws_vpn_gateway.vpc-vgw.id}"
 }
 
@@ -80,55 +90,87 @@ resource "aws_vpn_connection" "vpc-vpn" {
 }
 
 # define a static route between a VPN connection and a customer gateway
-# create a route to GCP loadbalancer subnet
-resource "aws_vpn_connection_route" "gcp_route_lb" {
+# create a route to GCP subnet
+resource "aws_vpn_connection_route" "gcp_route" {
   destination_cidr_block = "172.16.10.0/24"
-  vpn_connection_id      = "${aws_vpn_connection.vpc-vpn.id}"
-}
-
-# create a route to GCP test subnet
-resource "aws_vpn_connection_route" "gcp_route_test" {
-  destination_cidr_block = "172.16.1.0/24"
   vpn_connection_id      = "${aws_vpn_connection.vpc-vpn.id}"
 }
 
 # Our default security group to access
 # the instances over SSH and ICMP
-resource "aws_security_group" "default" {
-  name        = "vpn_security_group"
+resource "aws_security_group" "external_sg" {
+  name        = "sg_external"
   vpc_id      = "${aws_vpc.vpc.id}"
 
-  # ICMP access from remote GCP loadbalancer subnet
-  # containing web server frontends
+  # external ssh access over the internet
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "internal_sg" {
+  name        = "sg_internal"
+  vpc_id      = "${aws_vpc.vpc.id}"
+
+  # internal tcp and icmp access within aws subnet
   ingress {
     from_port   = 8
     to_port     = 0
     protocol    = "icmp"
-    cidr_blocks = ["${var.gcp_lb_cidr}"]
+    cidr_blocks = ["${var.cidr_block}"]
   }
-
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["${var.cidr_block}"]
+  }
 }
 
 # Create the instance
-resource "aws_instance" "oracle_db" {
+resource "aws_instance" "instance_1" {
   instance_type = "t2.micro"
 
-  # Lookup the correct AMI based on the region
-  # we specified
+  # Lookup the correct AMI based on the region specified
   ami = "${lookup(var.amis, var.region)}"
 
-  # The name of our SSH keypair you've created and downloaded
-  # from the AWS console.
-  # https://console.aws.amazon.com/ec2/v2/home?region=eu-west-1#KeyPairs:
+  # The name of SSH keypair you've created and downloaded from the AWS console.
   key_name = "${var.key_name}"
 
   # Our Security group to allow SSH and ICMP access
-  vpc_security_group_ids = ["${aws_security_group.default.id}"]
-  subnet_id              = "${aws_subnet.private.id}"
-  //user_data              = "${file("userdata.sh")}"
+  vpc_security_group_ids = [
+    "${aws_security_group.external_sg.id}",
+    "${aws_security_group.internal_sg.id}"
+  ]
+  subnet_id = "${aws_subnet.public_subnet.id}"
 
   #Instance tags
   tags {
-    Name = "${var.name}-instance"
+    Name = "${var.name}-instance-1"
+  }
+}
+
+resource "aws_instance" "instance_2" {
+  instance_type = "t2.micro"
+
+  # Lookup the correct AMI based on the region specified
+  ami = "${lookup(var.amis, var.region)}"
+
+  # The name of SSH keypair you've created and downloaded from the AWS console.
+  key_name = "${var.key_name}"
+
+  # Our Security group to allow SSH and ICMP access
+  vpc_security_group_ids = [
+    "${aws_security_group.external_sg.id}",
+    "${aws_security_group.internal_sg.id}"
+  ]
+  subnet_id = "${aws_subnet.public_subnet.id}"
+
+  #Instance tags
+  tags {
+    Name = "${var.name}-instance-2"
   }
 }

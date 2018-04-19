@@ -23,10 +23,7 @@ variable "key_name" {
 variable "vpn_ip_address" {
     description = "Internet-routable IP address of the customer gateway's external interface."
 }
-variable "vpn_dst_cidr_block" {
-    description = "Internal network IP range to advertise over the VPN connection to the VPC."
-    default = "172.16.0.0/16"
-}
+
 variable "vpn_bgp_asn" {
     description = "BPG Autonomous System Number (ASN) of the customer gateway for a dynamically routed VPN connection."
     default = "65000"
@@ -36,7 +33,7 @@ variable "zone" {
     description = "availability zone to use."
 }
 
-variable "private_subnet" {
+variable "public_subnet" {
     description = "CIDR block to use as private subnet; instances launced will NOT be assigned a public IP address."
     default = "10.0.1.0/24"
 }
@@ -60,12 +57,7 @@ variable "preshared_key" {
     description = "preshaed key used for tunnels 1 and 2"
 }
 
-variable "gcp_bastion_cidr" {
-    description = "remote GCP bastion subnet"
-    default = "172.16.1.0/24"
-}
-
-variable "gcp_lb_cidr" {
-    description = "remote GCP loadbalancer subnet"
+variable "gcp_cidr" {
+    description = "remote GCP subnet"
     default = "172.16.10.0/24"
 }
