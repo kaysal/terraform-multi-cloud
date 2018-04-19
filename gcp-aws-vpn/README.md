@@ -21,25 +21,27 @@ The IPsec VPN tunnels has the following features:
 ### Deploying This Example on Terraform
 There are 2 environments *prod* and *stage*. This example only uses *stage*.
 
-1. Run the AWS Terraform script in the directory *../gcp-aws-vpn/aws-vpn*. This will create output variables for the AWS VPN tunnel headend IP addresses that will be used as terraform_remote_state input for configuring the GCP IPsec tunnel.
+1. Create an external IP address on GCP and save the value as *vpn_ip_address* in your aws-vpn/terraform.tfvars file or equivalent environment variable.
+
+2. Run the AWS Terraform script in the directory *../gcp-aws-vpn/aws-vpn*. This will create output variables for the AWS VPN tunnel headend IP addresses that will be used as terraform_remote_state input for configuring the GCP IPsec tunnel.
     ```sh
     terraform plan
     terraform apply
     ```
 
-2. Run the GCP Terraform script in the directory *../gcp-aws-vpn/gcp-ipv6_lb-vpn*.
+3. Run the GCP Terraform script in the directory *../gcp-aws-vpn/gcp-ipv6_lb-vpn*.
     ```sh
     terraform plan
     terraform apply
     ```
 
-3. Grab the IPv6 address of the GCP loadbalancer and paste it into a web browser to view the *www* backend web server content. Add *"/video"* to the URL to view the *www-video* backend web server content.
+4. Grab the IPv6 address of the GCP loadbalancer and paste it into a web browser to view the *www* backend web server content. Add *"/video"* to the URL to view the *www-video* backend web server content.
 
-4. SSH into the GCP bastion using bastion instance public IP address
+5. SSH into the GCP bastion using bastion instance public IP address
 
-5. From the bastion server, SSH into the *www* and *www-video* backend server instances.
- 
-6. Test the ping connectivity from the web servers to the AWS instance. You should not be able to ping from the bastion instance to the AWS instance because of the security rules in place.
+6. From the bastion server, SSH into the *www* and *www-video* backend server instances.
+
+7. Test the ping connectivity from the web servers to the AWS instance. You should not be able to ping from the bastion instance to the AWS instance because of the security rules in place.
 
 [diagram]: http://storage.googleapis.com/cloud-network-things/multi-cloud/ipsec/gcp-aws/aws-gcp-vpn.PNG
 [Content Based Load Balancing in Google Cloud]: https://github.com/terraform-providers/terraform-provider-google/tree/master/examples/content-based-load-balancing
