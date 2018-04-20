@@ -130,6 +130,37 @@ resource "aws_security_group" "internal_sg" {
   }
 }
 
+resource "aws_security_group" "vpn_sg" {
+  name        = "sg_vpn"
+  vpc_id      = "${aws_vpc.vpc.id}"
+
+  # internal tcp and icmp access within aws subnet
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["${var.gcp_cidr}"]
+  }
+  ingress {
+    from_port   = 8
+    to_port     = 0
+    protocol    = "icmp"
+    cidr_blocks = ["${var.gcp_cidr}"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["${var.gcp_cidr}"]
+  }
+  egress {
+    from_port   = 8
+    to_port     = 0
+    protocol    = "icmp"
+    cidr_blocks = ["${var.gcp_cidr}"]
+  }
+}
+
 # Create the instance
 resource "aws_instance" "instance_1" {
   instance_type = "t2.micro"
@@ -143,7 +174,8 @@ resource "aws_instance" "instance_1" {
   # Our Security group to allow SSH and ICMP access
   vpc_security_group_ids = [
     "${aws_security_group.external_sg.id}",
-    "${aws_security_group.internal_sg.id}"
+    "${aws_security_group.internal_sg.id}",
+    "${aws_security_group.vpn_sg.id}"
   ]
   subnet_id = "${aws_subnet.public_subnet.id}"
 
@@ -165,7 +197,8 @@ resource "aws_instance" "instance_2" {
   # Our Security group to allow SSH and ICMP access
   vpc_security_group_ids = [
     "${aws_security_group.external_sg.id}",
-    "${aws_security_group.internal_sg.id}"
+    "${aws_security_group.internal_sg.id}",
+    "${aws_security_group.vpn_sg.id}"
   ]
   subnet_id = "${aws_subnet.public_subnet.id}"
 

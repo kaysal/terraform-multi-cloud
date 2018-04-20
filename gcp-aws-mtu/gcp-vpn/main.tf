@@ -108,7 +108,7 @@ resource "google_compute_instance" "instance_2" {
 # FW rule to allow all TCP connections in the vpc
 # FW rule uses service accounts of instances_1 and instance_2
 resource "google_compute_firewall" "allow_internal_ssh" {
-  name    = "allow-internal-ssh-only"
+  name    = "allow-internal-ssh"
   network = "${google_compute_network.vpc_demo.self_link}"
   allow {
     protocol = "tcp"
@@ -120,7 +120,7 @@ resource "google_compute_firewall" "allow_internal_ssh" {
 # FW rule to allow all ICMP connections in the vpc
 # FW rule uses service accounts for rule target
 resource "google_compute_firewall" "allow_internal_icmp" {
-  name    = "allow-internal-icmp-only"
+  name    = "allow-internal-icmp"
   network = "${google_compute_network.vpc_demo.self_link}"
   allow {
     protocol = "icmp"
@@ -143,7 +143,7 @@ resource "google_compute_firewall" "allow_external_ssh" {
 }
 
 resource "google_compute_firewall" "allow_vpn_icmp" {
-  name    = "allow-vpn-icmp-only"
+  name    = "allow-vpn-icmp"
   network = "${google_compute_network.vpc_demo.self_link}"
   allow {
     protocol = "icmp"
@@ -152,8 +152,8 @@ resource "google_compute_firewall" "allow_vpn_icmp" {
   target_service_accounts  = ["${var.source_service_accounts}"]
 }
 
-resource "google_compute_firewall" "allow_external_ssh" {
-  name    = "allow-external-ssh"
+resource "google_compute_firewall" "allow_vpn_ssh" {
+  name    = "allow-vpn-ssh"
   network = "${google_compute_network.vpc_demo.self_link}"
   allow {
     protocol = "tcp"
