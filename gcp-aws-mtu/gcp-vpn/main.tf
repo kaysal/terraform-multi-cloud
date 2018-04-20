@@ -110,11 +110,9 @@ resource "google_compute_instance" "instance_2" {
 resource "google_compute_firewall" "allow_internal_ssh" {
   name    = "allow-internal-ssh-only"
   network = "${google_compute_network.vpc_demo.self_link}"
-
   allow {
     protocol = "tcp"
   }
-
   source_service_accounts  = ["${var.source_service_accounts}"]
   target_service_accounts  = ["${var.source_service_accounts}"]
 }
@@ -124,26 +122,44 @@ resource "google_compute_firewall" "allow_internal_ssh" {
 resource "google_compute_firewall" "allow_internal_icmp" {
   name    = "allow-internal-icmp-only"
   network = "${google_compute_network.vpc_demo.self_link}"
-
   allow {
     protocol = "icmp"
   }
-
   source_service_accounts  = ["${var.source_service_accounts}"]
   target_service_accounts  = ["${var.source_service_accounts}"]
 }
 
-# FW rule to allow external SSH access into the instances
+# FW rule to allow external SSH
 resource "google_compute_firewall" "allow_external_ssh" {
   name    = "allow-external-ssh"
   network = "${google_compute_network.vpc_demo.self_link}"
-
   allow {
     protocol = "tcp"
     ports    = ["22"]
   }
-
   source_ranges  = ["0.0.0.0/0"]
+  // using tags as firewall target just to illustrate variety
+  target_tags   = ["vm-tag"]
+}
+
+resource "google_compute_firewall" "allow_vpn_icmp" {
+  name    = "allow-vpn-icmp-only"
+  network = "${google_compute_network.vpc_demo.self_link}"
+  allow {
+    protocol = "icmp"
+  }
+  source_ranges  = ["${var.remote_cidr}"]
+  target_service_accounts  = ["${var.source_service_accounts}"]
+}
+
+resource "google_compute_firewall" "allow_external_ssh" {
+  name    = "allow-external-ssh"
+  network = "${google_compute_network.vpc_demo.self_link}"
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+  source_ranges  = ["${var.remote_cidr}"]
   target_tags   = ["vm-tag"]
 }
 
