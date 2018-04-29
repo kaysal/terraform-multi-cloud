@@ -43,5 +43,4 @@ There are 2 environments *prod* and *stage*. This example only uses *stage*.
 
 7. Test the ping connectivity from the web servers to the AWS instance. You should not be able to ping from the bastion instance to the AWS instance because of the security rules in place.
 
-[diagram]: http://storage.googleapis.com/cloud-network-things/multi-cloud/ipsec/gcp-aws/aws-gcp-vpn.PNG
-[Content Based Load Balancing in Google Cloud]: https://github.com/terraform-providers/terraform-provider-google/tree/master/examples/content-based-load-balancing
+[diagram]: https://storage.googleapis.com/cloud-network-things/multi-cloud/mtu/gcp-aws-mtu3.PNG
