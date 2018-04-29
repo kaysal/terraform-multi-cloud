@@ -42,8 +42,8 @@ resource "google_compute_subnetwork" "subnet_vm" {
 
 #Create the instances
 #------------------------
-resource "google_compute_instance" "instance_1" {
-  name         = "instance-1"
+resource "google_compute_instance" "gcp_host_1" {
+  name         = "gcp-host-1"
   machine_type = "f1-micro"
   tags         = ["vm-tag"]
 
@@ -72,8 +72,8 @@ resource "google_compute_instance" "instance_1" {
   }
 }
 
-resource "google_compute_instance" "instance_2" {
-  name         = "instance-2"
+resource "google_compute_instance" "gcp_host_2" {
+  name         = "gcp-host-2"
   machine_type = "f1-micro"
   tags         = ["vm-tag"]
 
@@ -106,7 +106,7 @@ resource "google_compute_instance" "instance_2" {
 #--------------------------------------
 
 # FW rule to allow all TCP connections in the vpc
-# FW rule uses service accounts of instances_1 and instance_2
+# FW rule uses service accounts of all vpc instances
 resource "google_compute_firewall" "allow_internal_ssh" {
   name    = "allow-internal-ssh"
   network = "${google_compute_network.vpc_demo.self_link}"

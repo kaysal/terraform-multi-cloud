@@ -26,13 +26,13 @@ resource "aws_subnet" "public_subnet" {
     }
 }
 
-resource "aws_eip" "eip_instance_1" {
-  instance = "${aws_instance.instance_1.id}"
+resource "aws_eip" "eip_aws_host_1" {
+  instance = "${aws_instance.aws_host_1.id}"
   vpc      = true
 }
 
-resource "aws_eip" "eip_instance_2" {
-  instance = "${aws_instance.instance_2.id}"
+resource "aws_eip" "eip_aws_host_2" {
+  instance = "${aws_instance.aws_host_2.id}"
   vpc      = true
 }
 
@@ -142,8 +142,8 @@ resource "aws_security_group" "vpn_sg" {
     cidr_blocks = ["${var.gcp_cidr}"]
   }
   ingress {
-    from_port   = 8
-    to_port     = 0
+    from_port   = -1
+    to_port     = -1
     protocol    = "icmp"
     cidr_blocks = ["${var.gcp_cidr}"]
   }
@@ -154,15 +154,15 @@ resource "aws_security_group" "vpn_sg" {
     cidr_blocks = ["${var.gcp_cidr}"]
   }
   egress {
-    from_port   = 8
-    to_port     = 0
+    from_port   = -1
+    to_port     = -1
     protocol    = "icmp"
     cidr_blocks = ["${var.gcp_cidr}"]
   }
 }
 
 # Create the instance
-resource "aws_instance" "instance_1" {
+resource "aws_instance" "aws_host_1" {
   instance_type = "t2.micro"
 
   # Lookup the correct AMI based on the region specified
@@ -181,11 +181,11 @@ resource "aws_instance" "instance_1" {
 
   #Instance tags
   tags {
-    Name = "${var.name}-instance-1"
+    Name = "${var.name}-aws-host-1"
   }
 }
 
-resource "aws_instance" "instance_2" {
+resource "aws_instance" "aws_host_2" {
   instance_type = "t2.micro"
 
   # Lookup the correct AMI based on the region specified
@@ -204,6 +204,6 @@ resource "aws_instance" "instance_2" {
 
   #Instance tags
   tags {
-    Name = "${var.name}-instance-2"
+    Name = "${var.name}-aws-host-2"
   }
 }
